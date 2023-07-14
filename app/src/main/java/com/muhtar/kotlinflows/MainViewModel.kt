@@ -23,34 +23,22 @@ class MainViewModel: ViewModel() {
     }
 
     private fun collectFlow() {
+        val flow1 = flow {
+            emit(1)
+            delay(500L)
+            emit(2)
+        }
+
         viewModelScope.launch {
-            val count = countDownValue.filter {time ->
-                time % 2 == 0
-            }
-//                .map {time ->
-//                    time * time
-//                }
-//                .onEach { time ->
-//                    println(time)
-//                }
-                .count{
-                    it % 2 == 0
+            flow1.flatMapConcat {value ->  
+                flow {
+                    emit(value + 1)
+                    delay(500L)
+                    emit(value + 2)
                 }
-            println("The count is $count")
-
-            val reduceResult = countDownValue.reduce{accumulator, value ->
-                println("The reduce accumulator $accumulator")
-                println("The reduce value $value")
-                accumulator + value
+            }.collect{value ->
+                println("The vallue is $value")
             }
-            println("The reduce result is $reduceResult")
-
-            val foldResult = countDownValue.fold(initial = 100){accumulator, value ->
-                println("The fold accumulator $accumulator")
-                println("The fold value $value")
-                accumulator + value
-            }
-            println("The fold result is $foldResult")
         }
     }
 }
